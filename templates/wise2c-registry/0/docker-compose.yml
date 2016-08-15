@@ -1,0 +1,141 @@
+prepare:
+  image: registry.aliyuncs.com/ljchen/harbor-prepare:v0.3
+  container_name: wise2c-reg-prepare
+  volume_driver: ${VOLUME_DRIVER}
+  volumes:
+    - ${EXTERNAL_DIR}:/harbor
+    - ${EXTERNAL_DIR}-log:/var/log/docker/
+    - ${EXTERNAL_DIR}-storage:/storage
+    - ${EXTERNAL_DIR}-database:/var/lib/mysql
+    - ${EXTERNAL_DIR}-log-job_logs:/var/log/jobs
+    - ${EXTERNAL_DIR}-config-ui:/etc/ui
+    - ${EXTERNAL_DIR}-config-registry:/etc/registry/
+    - ${EXTERNAL_DIR}-config-jobservice:/etc/jobservice
+    - ${EXTERNAL_DIR}-config-nginx:/etc/nginx
+  net: none
+  command: /usr/local/bin/python /root/prepare.py
+  environment:
+    - BACKEND_STORAGE_TYPE=${BACKEND_STORAGE_TYPE}
+    - SWIFT_AUTH_URL=${SWIFT_AUTH_URL}
+    - SWIFT_USER_NAME=${SWIFT_USER_NAME}
+    - SWIFT_PASSWD=${SWIFT_PASSWD}
+    - SWIFT_CONTAINER=${SWIFT_CONTAINER}
+    - HOSTNAME=${HOSTNAME}
+    - UI_URL_PROTOCOL=${UI_URL_PROTOCOL}
+    - EMAIL_SERVER=${EMAIL_SERVER}
+    - EMAIL_SERVER_PORT=${EMAIL_SERVER_PORT}
+    - EMAIL_USERNAME=${EMAIL_USERNAME}
+    - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+    - EMAIL_FROM=${EMAIL_FROM}
+    - EMAIL_SSL=${EMAIL_SSL}
+    - HARBOR_ADMIN_PASSWORD=${HARBOR_ADMIN_PASSWORD}
+    - AUTH_MODE=${AUTH_MODE}
+    - LDAP_URL=${LDAP_URL}
+    - LDAP_BASEDN=${LDAP_BASEDN}
+    - DB_PASSWORD=${DB_PASSWORD}
+    - SELF_REGISTRATION=${SELF_REGISTRATION}
+    - CUSTOMIZE_CRT=${CUSTOMIZE_CRT}
+    - CRT_COUNTRY=${CRT_COUNTRY}
+    - CRT_STATE=${CRT_STATE}
+    - CRT_LOCATION=${CRT_LOCATION}
+    - CRT_ORGANIZATION=${CRT_ORGANIZATION}
+    - CRT_ORGANIZATIONALUNIT=${CRT_ORGANIZATIONALUNIT}
+    - CRT_COMMONNAME=${CRT_COMMONNAME}
+    - CRT_EMAIL=${CRT_EMAIL}
+    - MAX_JOB_WORKERS=${MAX_JOB_WORKERS}
+    - VERIFY_REMOTE_CERT=${VERIFY_REMOTE_CERT}
+  labels:
+    io.rancher.container.start_once: 'true'
+
+#log:
+#  image: registry.aliyuncs.com/ljchen/harbor-log:v0.3
+#  container_name: wise2c-reg-log
+#  ports:
+#    - 1514:514
+#  links:
+#    - prepare
+#  volume_driver: ${VOLUME_DRIVER}
+#  volumes:
+#    - ${EXTERNAL_DIR}-log:/var/log/docker/
+
+registry:
+  image: library/registry:2.4.0
+  container_name: wise2c-reg-registry
+  environment:
+    - GODEBUG=netdns=cgo
+  ports:
+    - 5001:5001
+  links:
+    - prepare
+  command:
+    ["serve", "/etc/registry/config.yml"]
+  #log_driver: "syslog"
+  #log_opt:
+  #    syslog-address: "tcp://127.0.0.1:1514"
+  #    syslog-tag: "registry"
+  volume_driver: ${VOLUME_DRIVER}
+  volumes:
+    - ${EXTERNAL_DIR}-storage:/storage
+    - ${EXTERNAL_DIR}-config-registry:/etc/registry/
+    
+mysql:
+  image: registry.aliyuncs.com/ljchen/harbor-mysql:v0.3
+  container_name: wise2c-reg-mysql
+  environment:
+    - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+  #log_driver: "syslog"
+  #log_opt:
+  #    syslog-address: "tcp://127.0.0.1:1514"
+  #    syslog-tag: "mysql"
+  ports:
+    - 3306:3306
+  links:
+    - prepare
+  volume_driver: ${VOLUME_DRIVER}
+  volumes:
+    - ${EXTERNAL_DIR}-database:/var/lib/mysql
+
+ui:
+  image: registry.aliyuncs.com/ljchen/harbor-ui:v0.3
+  container_name: wise2c-reg-ui
+  links:
+    - mysql
+  #log_driver: "syslog"
+  #log_opt:
+  #    syslog-address: "tcp://127.0.0.1:1514"
+  #    syslog-tag: "ui"
+  volume_driver: ${VOLUME_DRIVER}
+  volumes:
+    - ${EXTERNAL_DIR}-config-ui:/etc/ui
+
+jobservice:
+  image: registry.aliyuncs.com/ljchen/harbor-jobservice:v0.3
+  container_name: wise2c-reg-jobservice
+  links:
+    - mysql
+  #log_driver: "syslog"
+  #log_opt:
+  #    syslog-address: "tcp://127.0.0.1:1514"
+  #    syslog-tag: "jobservice"
+  volume_driver: ${VOLUME_DRIVER}
+  volumes:
+    - ${EXTERNAL_DIR}-log-job_logs:/var/log/jobs
+    - ${EXTERNAL_DIR}-config-jobservice:/etc/jobservice
+
+proxy:
+  image: library/nginx:1.9
+  container_name: wise2c-reg-mysql
+  ports:
+    - 80:80
+    - 443:443
+  links:
+    - registry
+    - ui
+    - jobservice
+  #log_driver: "syslog"
+  #log_opt:
+  #    syslog-address: "tcp://127.0.0.1:1514"
+  #    syslog-tag: "proxy"
+  volume_driver: ${VOLUME_DRIVER}
+  volumes:
+    - ${EXTERNAL_DIR}-config-nginx:/etc/nginx

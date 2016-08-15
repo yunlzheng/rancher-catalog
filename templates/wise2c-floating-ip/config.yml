@@ -1,0 +1,5 @@
+name: Wise2C Floating IP
+description: |
+  Wise2C Floating IP
+version: v0.1
+category: Rancher Services

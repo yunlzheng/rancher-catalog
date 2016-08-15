@@ -1,0 +1,18 @@
+fip-worker:
+  image: registry.cn-hangzhou.aliyuncs.com/ljchen/floating-ip-worker:latest
+  volumes:
+    - /var/run:/var/run
+  net: host
+  stdin_open: true
+  tty: true
+  privileged: true
+  command: -d
+  labels:
+      io.rancher.sidekicks: metadata-confd
+      io.rancher.scheduler.global: true
+
+metadata-confd:
+  image: registry.cn-hangzhou.aliyuncs.com/ljchen/metadata-confd:latest
+  volumes:
+    - /var/run:/var/run
+  privileged: true
