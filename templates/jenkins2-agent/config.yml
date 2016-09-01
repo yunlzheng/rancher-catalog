@@ -1,0 +1,5 @@
+name: Jenkins2 Agent
+description: |
+  # Jenkins2 Agent
+version: 0.0.1
+category: CI
