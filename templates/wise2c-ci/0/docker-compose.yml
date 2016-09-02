@@ -45,15 +45,6 @@ wise2build-worker:
     - /var/run/docker.sock:/var/run/docker.sock
     - /root/.jenkins/workspace:/root/.jenkins/workspace
     - /root/.jenkins/jobs:/root/.jenkins/jobs
-wise2build-env:
-  image: registry.aliyuncs.com/wise2c/build-env:${release_version}
-  labels:
-    io.rancher.container.pull_image: always
-    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
-  links:
-    - eureka-server:eureka-server
-  tty: true
-  stdin_open: true
 eureka-server:
   image: registry.aliyuncs.com/wise2c/eureka-server:${release_version}
   labels:
