@@ -1,0 +1,73 @@
+webfrontend-lb:
+  image: rancher/load-balancer-service
+  ports:
+  - $HTTP_PORT:80
+  tty: true
+  links:
+  - wise2build-frontend:wise2build-frontend
+  - static-web-server:static-web-server
+  - wise2build-biz:wise2build-biz
+  labels:
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+    io.rancher.loadbalancer.target.wise2build-frontend: ${http_port}=80
+    io.rancher.loadbalancer.target.static-web-server: ${http_port}/artifacts=80
+    io.rancher.loadbalancer.target.wise2build-biz: ${http_port}/api=80,$HTTP_PORT/sockjs=80
+wise2build-biz:
+  image: registry.aliyuncs.com/wise2c/build-biz:${release_version}
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  links:
+    - eureka-server
+    - mysql-server
+    - rabbitmq
+    - redis
+  tty: true
+  stdin_open: true
+wise2build-worker:
+  image: registry.aliyuncs.com/wise2c/build-worker:${release_version}
+  stdin_open: true
+  tty: true
+  links:
+    - eureka-server
+    - rabbitmq
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /root/.jenkins/workspace:/root/.jenkins/workspace
+    - /root/.jenkins/jobs:/root/.jenkins/jobs
+wise2build-env:
+  image: registry.aliyuncs.com/wise2c/build-env:${release_version}
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  links:
+    - eureka-server:eureka-server
+  tty: true
+  stdin_open: true
+eureka-server:
+  image: registry.aliyuncs.com/wise2c/eureka-server:${release_version}
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  tty: true
+  stdin_open: true
+mysql-server:
+  image: mysql:5.5
+  environment:
+    MYSQL_ROOT_PASSWORD: my-secret-pw
+    MYSQL_DATABASE: builderdb
+  labels:
+    io.rancher.container.pull_image: always
+  tty: true
+  stdin_open: true
+  command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+rabbitmq:
+  image: rabbitmq:3-management
+  environment:
+    - RABBITMQ_DEFAULT_USER=wise2c
+    - RABBITMQ_DEFAULT_PASS=wise2c
+redis:
+  image: redis
