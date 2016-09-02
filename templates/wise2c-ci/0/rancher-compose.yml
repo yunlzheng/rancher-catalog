@@ -24,6 +24,7 @@
       label: "Schedule Host Label"
       required: true
       type: "string"
+      default: "wise2builder"
       description: |
         schedule host label
     - variable: schedule_host_label_value
