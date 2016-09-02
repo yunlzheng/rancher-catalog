@@ -11,7 +11,14 @@ webfrontend-lb:
     io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
     io.rancher.loadbalancer.target.wise2build-frontend: ${http_port}=80
     io.rancher.loadbalancer.target.static-web-server: ${http_port}/artifacts=80
-    io.rancher.loadbalancer.target.wise2build-biz: ${http_port}/api=80,$HTTP_PORT/sockjs=80
+    io.rancher.loadbalancer.target.wise2build-biz: ${http_port}/api=80, ${http_port}/sockjs=80
+wise2build-frontend:
+  image: registry.aliyuncs.com/wise2c/wisebuild-fronted:${release_version}
+  stdin_open: true
+  tty: true
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
 wise2build-biz:
   image: registry.aliyuncs.com/wise2c/build-biz:${release_version}
   labels:
@@ -53,6 +60,15 @@ eureka-server:
     io.rancher.container.pull_image: always
     io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
   tty: true
+  stdin_open: true
+static-web-server:
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  tty: true
+  image: nginx:1.10
+  volumes:
+  - /root/.jenkins/jobs:/usr/share/nginx/html/artifacts
   stdin_open: true
 mysql-server:
   image: mysql:5.5
