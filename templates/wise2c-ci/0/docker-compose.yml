@@ -53,17 +53,21 @@ mysql-server:
     MYSQL_ROOT_PASSWORD: my-secret-pw
     MYSQL_DATABASE: builderdb
   labels:
-    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
   tty: true
   stdin_open: true
   command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 rabbitmq:
   image: rabbitmq:3-management
+  labels:
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
   environment:
     - RABBITMQ_DEFAULT_USER=wise2c
     - RABBITMQ_DEFAULT_PASS=wise2c
 redis:
   image: redis
+  labels:
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
 wise2ci-vip:
   image: rancher/load-balancer-service
   ports:
