@@ -1,0 +1,33 @@
+postgres-server:
+  environment:
+    POSTGRES_USER: sonar
+    POSTGRES_PASSWORD: sonar
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  tty: true
+  image: postgres
+  stdin_open: true
+sonarqube:
+  environment:
+    SONARQUBE_JDBC_USERNAME: sonar
+    SONARQUBE_JDBC_PASSWORD: sonar
+    SONARQUBE_JDBC_URL: jdbc:postgresql://postgres-server/sonar
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  tty: true
+  image: sonarqube
+  links:
+  - postgres-server:postgres-server
+  stdin_open: true
+sonarqube-lb:
+  ports:
+  - ${http_port}:9000
+  tty: true
+  image: rancher/load-balancer-service
+  labels:
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  links:
+  - sonarqube:sonarqube
+  stdin_open: true

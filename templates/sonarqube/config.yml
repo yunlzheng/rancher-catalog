@@ -1,0 +1,5 @@
+name: Sonarqube
+description: |
+  Wise2c static analysis solution
+version: v0.1
+category: CI
