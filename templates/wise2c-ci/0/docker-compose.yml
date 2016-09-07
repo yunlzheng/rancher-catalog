@@ -49,6 +49,7 @@ static-web-server:
   stdin_open: true
 mysql-server:
   image: mysql:5.5
+  - 3306:3306
   environment:
     MYSQL_ROOT_PASSWORD: my-secret-pw
     MYSQL_DATABASE: builderdb
