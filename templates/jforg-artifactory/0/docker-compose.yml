@@ -1,0 +1,7 @@
+jforg-artifactory:
+  labels:
+    io.rancher.container.pull_image: always
+    io.rancher.scheduler.affinity:host_label: ${schedule_host_label}=${schedule_host_label_value}
+  tty: true
+  image: scandio/jfrog-artifactory:1.1
+  stdin_open: true
