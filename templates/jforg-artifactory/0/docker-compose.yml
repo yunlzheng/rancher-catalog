@@ -5,3 +5,5 @@ jforg-artifactory:
   tty: true
   image: scandio/jfrog-artifactory:1.1
   stdin_open: true
+  ports:
+  - ${http_port}:80

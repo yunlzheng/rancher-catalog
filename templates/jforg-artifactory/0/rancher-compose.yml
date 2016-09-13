@@ -1,0 +1,26 @@
+.catalog:
+  name: Jforg Artifactory
+  version: "1.1"
+  description: |
+    Wise2c Artifactory Management Solution
+  questions:
+    - variable: http_port
+      label: "Web Public Http Port"
+      type: "int"
+      required: true
+      default: 80
+      description: |
+        website public http port
+    - variable: schedule_host_label
+      label: "Schedule Host Label"
+      required: true
+      type: "string"
+      default: "wise2builder"
+      description: |
+        schedule host label
+    - variable: schedule_host_label_value
+      label: "Schedule Host Label Value"
+      required: true
+      type: "string"
+      description: |
+        schedule host label value
