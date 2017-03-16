@@ -6,6 +6,7 @@ Fluentd is an open source data collector for unified logging layer
 
 * fluent-plugin-secure-forward
 * fluent-plugin-elasticsearch
+* fluent-plugin-record-reformer
 
 ### Usage
 

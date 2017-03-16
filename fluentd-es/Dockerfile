@@ -18,7 +18,8 @@ RUN apk --no-cache --update add \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/*
 
 RUN fluent-gem install fluent-plugin-secure-forward && \
-    fluent-gem install fluent-plugin-elasticsearch
+    fluent-gem install fluent-plugin-elasticsearch && \
+    fluent-gem install fluent-plugin-record-reformer
 
 RUN adduser -D -g '' -u 1000 -h /home/fluent fluent
 RUN chown -R fluent:fluent /home/fluent
