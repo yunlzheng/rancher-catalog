@@ -9,4 +9,4 @@ services:
     external_links:
       - "${elasticsearch}:elasticsearch"
     labels:
-      io.rancher.container.pull_image: always
+      io.rancher.scheduler.global: 'true'
