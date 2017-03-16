@@ -1,0 +1,12 @@
+.catalog:
+  name: fluentd
+  version: "0.0.1"
+  description: |
+    fluentd
+  questions:
+    - variable: elasticsearch
+      label: "elasticsearch master"
+      type: "service"
+      required: true
+      description: |
+        elasticsearch master

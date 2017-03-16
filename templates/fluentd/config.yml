@@ -1,0 +1,5 @@
+name: Fluentd
+description: |
+  # Fluentd
+version: 0.0.1
+category: LOG

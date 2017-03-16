@@ -1,0 +1,12 @@
+version: '2'
+services:
+  fluent-es:
+    image: yunlzheng/fluent-es
+    stdin_open: true
+    tty: true
+    ports:
+    - 24224:24224/tcp
+    external_links:
+      - "${elasticsearch}:elasticsearch"
+    labels:
+      io.rancher.container.pull_image: always
