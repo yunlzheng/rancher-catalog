@@ -21,23 +21,15 @@ RUN fluent-gem install fluent-plugin-secure-forward && \
     fluent-gem install fluent-plugin-elasticsearch && \
     fluent-gem install fluent-plugin-record-reformer
 
-RUN adduser -D -g '' -u 1000 -h /home/fluent fluent
-RUN chown -R fluent:fluent /home/fluent
-
 # for log storage (maybe shared with host)
 RUN mkdir -p /fluentd/log
 # configuration/plugins path (default: copied from .)
 RUN mkdir -p /fluentd/etc /fluentd/plugins
 
-RUN chown -R fluent:fluent /fluentd
-
-USER fluent
-WORKDIR /home/fluent
-
 # Tell ruby to install packages as user
 RUN echo "gem: --user-install --no-document" >> ~/.gemrc
-ENV PATH /home/fluent/.gem/ruby/2.3.0/bin:$PATH
-ENV GEM_PATH /home/fluent/.gem/ruby/2.3.0:$GEM_PATH
+ENV PATH ~/.gem/ruby/2.3.0/bin:$PATH
+ENV GEM_PATH ~/.gem/ruby/2.3.0:$GEM_PATH
 
 ADD fluent.conf /fluentd/etc/
 
