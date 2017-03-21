@@ -19,7 +19,8 @@ RUN apk --no-cache --update add \
 
 RUN fluent-gem install fluent-plugin-secure-forward && \
     fluent-gem install fluent-plugin-elasticsearch && \
-    fluent-gem install fluent-plugin-record-reformer
+    fluent-gem install fluent-plugin-record-reformer && \
+    fluent-gem install fluent-plugin-influxdb
 
 # for log storage (maybe shared with host)
 RUN mkdir -p /fluentd/log
